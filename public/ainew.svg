@@ -1,22 +1,91 @@
-<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 796 162" width="796" height="162">
-  <title>New logo</title>
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 162" width="820" height="162">
+  <title>KoinBX Logo</title>
+  <defs>
+    <!-- Gradient definitions for modern look -->
+    <linearGradient id="betaGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00c4f5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0099cc;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Shadow filter for depth -->
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#00000020"/>
+    </filter>
+    
+    <!-- Subtle inner shadow for depth -->
+    <filter id="innerShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feOffset dx="0" dy="1"/>
+      <feGaussianBlur stdDeviation="1" result="offset-blur"/>
+      <feFlood flood-color="#ffffff" flood-opacity="0.3"/>
+      <feComposite in2="offset-blur" operator="in"/>
+    </filter>
+  </defs>
+  
   <style>
     tspan { white-space:pre } 
-    .s0 { fill: #2b2b49;stroke: #2b2b49;paint-order:stroke fill markers;stroke-linejoin: round;stroke-width: 4 } 
-    .s1 { fill: #00c4f5;stroke: #00c4f5;paint-order:stroke fill markers;stroke-linejoin: round;stroke-width: 4 } 
-    .s2 { fill: #00c4f5 } 
-    .t3 { 
-      font-size: 61px;
+    .s0 { 
       fill: #2b2b49;
-      font-weight: 400;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      stroke: #2b2b49;
+      paint-order:stroke fill markers;
+      stroke-linejoin: round;
+      stroke-width: 4;
     } 
+    .s1 { 
+      fill: #00c4f5;
+      stroke: #00c4f5;
+      paint-order:stroke fill markers;
+      stroke-linejoin: round;
+      stroke-width: 4;
+    } 
+    .s2 { 
+      fill: url(#betaGradient);
+      filter: url(#shadow);
+    } 
+    .t3 { 
+      font-size: 38px;
+      fill: #ffffff;
+      font-weight: 600;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", system-ui, sans-serif;
+      letter-spacing: 0.8px;
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+    
+    /* Hover effect for interactivity */
+    .beta-badge:hover .s2 {
+      filter: url(#shadow) brightness(1.05);
+    }
+    
+    .beta-badge {
+      transition: all 0.2s ease;
+    }
+    
+    @media (prefers-reduced-motion: reduce) {
+      .beta-badge {
+        transition: none;
+      }
+    }
   </style>
-  <path id="koinbx ai" fill-rule="evenodd" class="s0" d="m26.5 34.97v74.06l10.46-10.34 4.48-4.42 36.54-36.2h8.91l-41.03 40.62 39.88 41.31h-8.97l-35.39-36.89-14.88 14.77v22.01h-6.32v-104.92zm109.28 108.25q-18.27 0-31.26-12.99-12.92-12.92-12.92-31.19 0-18.28 12.92-31.2 12.99-12.99 31.26-12.99 18.27 0 31.2 12.99 12.98 12.92 12.98 31.2 0 18.27-12.98 31.19-12.93 12.99-31.2 12.99zm0-82.05q-15.69 0-26.77 11.09-11.09 11.09-11.09 26.78 0 15.68 11.09 26.77 11.08 11.09 26.77 11.09 15.68 0 26.77-11.09 11.09-11.09 11.09-26.77 0-15.69-11.09-26.78-11.09-11.09-26.77-11.09zm61.72-3.21v82.04h-6.32v-82.04zm14.68 34.47q0-15.69 11.09-26.83 11.15-11.09 26.83-11.09 15.63 0 26.78 11.09 11.08 11.14 11.08 26.83v47.68h-6.26v-47.68q0-13.1-9.31-22.35-9.25-9.25-22.29-9.25-13.1 0-22.35 9.25-9.25 9.25-9.25 22.35v47.68h-6.32z"/>
-  <path id="koinbx ai" fill-rule="evenodd" class="s1" d="m324.3 60.83q10.23-5.98 22.06-5.98 18.27 0 31.2 12.99 12.99 12.92 12.99 31.2 0 18.27-12.99 31.25-12.93 12.93-31.2 12.93-18.27 0-31.25-12.93-12.93-12.98-12.93-31.25v-64.01h6.32v41.37q5.86-9.83 15.8-15.57zm-4.71 64.98q11.09 11.09 26.77 11.09 15.69 0 26.78-11.09 11.09-11.09 11.09-26.77 0-15.69-11.09-26.78-11.09-11.09-26.78-11.09-15.68 0-26.77 11.09-11.09 11.09-11.09 26.78 0 15.68 11.09 26.77zm111.94-26.89l29.19 41.08h-7.47l-25.46-35.79-25.45 35.79h-7.47l29.19-41.08-29.19-41.08h7.47l25.45 35.85 25.46-35.85h7.47z"/>
-  <path id="koinbx ai" fill-rule="evenodd" class="s0" d="m553.84 137.3q-10.23 5.92-22.06 5.92-18.27 0-31.26-12.93-12.92-12.98-12.92-31.25 0-18.28 12.92-31.2 12.99-12.99 31.26-12.99 18.27 0 31.2 12.99 12.98 12.92 12.98 31.2v41.02h-6.32v-18.39q-5.92 9.83-15.8 15.63zm4.71-65.04q-11.09-11.09-26.77-11.09-15.69 0-26.78 11.09-11.08 11.09-11.08 26.78 0 15.68 11.08 26.77 11.09 11.09 26.78 11.09 15.68 0 26.77-11.09 11.09-11.09 11.09-26.77 0-15.69-11.09-26.78zm37.95-14.3v82.04h-6.32v-82.04z"/>
-  <path id="Shape 1" fill-rule="evenodd" class="s2" d="m656.17 17h101.09c19.63 0 35.55 15.91 35.55 35.55 0 19.63-15.92 35.54-35.55 35.54h-101.09c-19.63 0-35.54-15.91-35.54-35.54 0-19.64 15.91-35.55 35.54-35.55z"/>
-  <text id="BETA" style="transform: matrix(.882,0,0,.882,642.734,71.509)">
-    <tspan x="0" y="0" class="t3">B</tspan><tspan y="0" class="t3">E</tspan><tspan y="0" class="t3">T</tspan><tspan y="0" class="t3">A</tspan>
-  </text>
+  
+  <!-- Main Logo Text -->
+  <path id="koinbx-main" fill-rule="evenodd" class="s0" d="m26.5 34.97v74.06l10.46-10.34 4.48-4.42 36.54-36.2h8.91l-41.03 40.62 39.88 41.31h-8.97l-35.39-36.89-14.88 14.77v22.01h-6.32v-104.92zm109.28 108.25q-18.27 0-31.26-12.99-12.92-12.92-12.92-31.19 0-18.28 12.92-31.2 12.99-12.99 31.26-12.99 18.27 0 31.2 12.99 12.98 12.92 12.98 31.2 0 18.27-12.98 31.19-12.93 12.99-31.2 12.99zm0-82.05q-15.69 0-26.77 11.09-11.09 11.09-11.09 26.78 0 15.68 11.09 26.77 11.08 11.09 26.77 11.09 15.68 0 26.77-11.09 11.09-11.09 11.09-26.77 0-15.69-11.09-26.78-11.09-11.09-26.77-11.09zm61.72-3.21v82.04h-6.32v-82.04zm14.68 34.47q0-15.69 11.09-26.83 11.15-11.09 26.83-11.09 15.63 0 26.78 11.09 11.08 11.14 11.08 26.83v47.68h-6.26v-47.68q0-13.1-9.31-22.35-9.25-9.25-22.29-9.25-13.1 0-22.35 9.25-9.25 9.25-9.25 22.35v47.68h-6.32z"/>
+  
+  <path id="koinbx-accent" fill-rule="evenodd" class="s1" d="m324.3 60.83q10.23-5.98 22.06-5.98 18.27 0 31.2 12.99 12.99 12.92 12.99 31.2 0 18.27-12.99 31.25-12.93 12.93-31.2 12.93-18.27 0-31.25-12.93-12.93-12.98-12.93-31.25v-64.01h6.32v41.37q5.86-9.83 15.8-15.57zm-4.71 64.98q11.09 11.09 26.77 11.09 15.69 0 26.78-11.09 11.09-11.09 11.09-26.77 0-15.69-11.09-26.78-11.09-11.09-26.78-11.09-15.68 0-26.77 11.09-11.09 11.09-11.09 26.78 0 15.68 11.09 26.77zm111.94-26.89l29.19 41.08h-7.47l-25.46-35.79-25.45 35.79h-7.47l29.19-41.08-29.19-41.08h7.47l25.45 35.85 25.46-35.85h7.47z"/>
+  
+  <path id="koinbx-final" fill-rule="evenodd" class="s0" d="m553.84 137.3q-10.23 5.92-22.06 5.92-18.27 0-31.26-12.93-12.92-12.98-12.92-31.25 0-18.28 12.92-31.2 12.99-12.99 31.26-12.99 18.27 0 31.2 12.99 12.98 12.92 12.98 31.2v41.02h-6.32v-18.39q-5.92 9.83-15.8 15.63zm4.71-65.04q-11.09-11.09-26.77-11.09-15.69 0-26.78 11.09-11.08 11.09-11.08 26.78 0 15.68 11.08 26.77 11.09 11.09 26.78 11.09 15.68 0 26.77-11.09 11.09-11.09 11.09-26.77 0-15.69-11.09-26.78zm37.95-14.3v82.04h-6.32v-82.04z"/>
+  
+  <!-- Modern BETA Badge with proper spacing -->
+  <g class="beta-badge">
+    <!-- Modern rounded rectangle with subtle border radius -->
+    <rect x="630" y="15" width="170" height="60" rx="30" ry="30" class="s2"/>
+    
+    <!-- Subtle highlight line on top -->
+    <rect x="638" y="20" width="154" height="1.5" rx="0.75" fill="rgba(255,255,255,0.4)"/>
+    
+    <!-- BETA Text - properly centered vertically and horizontally -->
+    <text x="715" y="45" class="t3">BETA</text>
+    
+    <!-- Optional: Small dot indicator for extra modern touch -->
+    <circle cx="680" cy="45" r="3" fill="rgba(255,255,255,0.6)"/>
+  </g>
 </svg>
