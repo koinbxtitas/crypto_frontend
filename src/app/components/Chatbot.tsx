@@ -99,7 +99,7 @@ export default function ChatBot() {
   const [currentUserName, setCurrentUserName] = useState("Alice");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const API_BASE_URL = "https://xzfpv760-3070.inc1.devtunnels.ms/api";
+  const API_BASE_URL = "https://localhost:3070/api";
 
   // Portfolio Component - Show ALL holdings
   const PortfolioView = ({ data }: { data: PortfolioData }) => {
