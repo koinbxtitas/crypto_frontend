@@ -10,6 +10,8 @@ import {
   TrendingUp,
   TrendingDown,
   Activity,
+  Plus,
+  X,
 } from "lucide-react";
 
 interface Message {
@@ -90,24 +92,56 @@ export default function ChatInterface() {
   const [error, setError] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string>("");
   const [currentUserName, setCurrentUserName] = useState("Titas");
+  const [showPrompts, setShowPrompts] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const API_BASE_URL = "http://172.188.32.111:3070/api";
 
-  // Portfolio Component - Material Design style
+  // Suggested prompts
+  const suggestedPrompts = [
+    "Show my portfolio",
+    "Show my P&L",
+    "What is KoinBX?",
+    "How to register in KoinBX?",
+    "How to do KYC in KoinBX?",
+    "How to verify bank account in KoinBX?",
+    "Price of Bitcoin in INR?",
+    "Trending cryptos",
+    "Best crypto to buy?",
+  ];
+
+  // User Avatar Component
+  const UserAvatar = ({
+    username,
+    size = 40,
+    className = "",
+  }: {
+    username: string;
+    size?: number;
+    className?: string;
+  }) => (
+    <div
+      className={`rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold ${className}`}
+      style={{ width: size, height: size, fontSize: size * 0.4 }}
+    >
+      {username.charAt(0).toUpperCase()}
+    </div>
+  );
+
   const PortfolioView = ({ data }: { data: PortfolioData }) => {
     const { summary, holdings } = data;
     const isProfit = summary.status === "profit";
 
     return (
       <div className="w-full">
-        {/* make width behavior consistent with ProfitLossView */}
-        <div className="w-full bg-white rounded-lg shadow-md p-6 border border-gray-200">
+        {" "}
+        {/* Add min-w-0 to prevent content expansion */}
+        <div className="w-xl bg-white rounded-lg shadow-md p-6 border border-gray-200">
           <div className="flex items-center space-x-4 mb-6">
             <div
-              className={`p-3 rounded-full ${
+              className={`p-3 rounded-full flex-shrink-0 ${
                 isProfit ? "bg-green-100" : "bg-red-100"
               }`}
             >
@@ -117,8 +151,10 @@ export default function ChatInterface() {
                 <TrendingDown className="w-6 h-6 text-red-700" />
               )}
             </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 text-lg">
+            <div className="min-w-0 flex-1">
+              {" "}
+              {/* Allow text to shrink */}
+              <h3 className="font-semibold text-gray-900 text-lg truncate">
                 {data.user}'s Portfolio
               </h3>
               <p className="text-sm text-gray-600">
@@ -128,24 +164,24 @@ export default function ChatInterface() {
           </div>
 
           <div className="bg-gray-50 rounded-lg p-5 mb-6">
-            <div className="grid grid-cols-2 gap-6 text-sm">
-              <div>
+            <div className="grid grid-cols-2 gap-6 text-sm min-w-0">
+              <div className="min-w-0">
                 <p className="text-gray-600 mb-2">Total Value</p>
-                <p className="font-bold text-gray-900 text-xl">
+                <p className="font-bold text-gray-900 text-xl break-words">
                   ${summary.total_value.toLocaleString()}
                 </p>
               </div>
-              <div>
+              <div className="min-w-0">
                 <p className="text-gray-600 mb-2">Invested</p>
-                <p className="font-bold text-gray-900 text-xl">
+                <p className="font-bold text-gray-900 text-xl break-words">
                   ${summary.total_invested.toLocaleString()}
                 </p>
               </div>
-              <div className="col-span-2 pt-4 border-t border-gray-200">
+              <div className="col-span-2 pt-4 border-t border-gray-200 min-w-0">
                 <p className="text-gray-600 mb-2">P&L</p>
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-3 flex-wrap">
                   <p
-                    className={`font-bold text-xl ${
+                    className={`font-bold text-xl break-words ${
                       isProfit ? "text-green-700" : "text-red-700"
                     }`}
                   >
@@ -153,7 +189,7 @@ export default function ChatInterface() {
                     {Math.abs(summary.profit_loss).toLocaleString()}
                   </p>
                   <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    className={`px-3 py-1 rounded-full text-sm font-medium flex-shrink-0 ${
                       isProfit
                         ? "bg-green-100 text-green-700"
                         : "bg-red-100 text-red-700"
@@ -166,47 +202,49 @@ export default function ChatInterface() {
             </div>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-4 min-w-0">
             <h4 className="text-lg font-semibold text-gray-900">
               Holdings ({holdings.length})
             </h4>
-            <div className="max-h-64 overflow-y-auto space-y-3">
+            <div className="max-h-64 overflow-y-auto space-y-3 custom-scrollbar min-w-0">
               {holdings.slice(0, 3).map((holding, index) => (
                 <div
                   key={index}
-                  className="bg-gray-50 rounded-lg p-4 border border-gray-200"
+                  className="bg-gray-50 rounded-lg p-4 border border-gray-200 min-w-0"
                 >
-                  <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-4 min-w-0">
                     {holding.icon_url ? (
                       <img
                         src={holding.icon_url}
                         alt={holding.crypto}
-                        className="w-10 h-10 rounded-full"
+                        className="w-10 h-10 rounded-full flex-shrink-0"
                         onError={(e) => {
                           e.currentTarget.style.display = "none";
                         }}
                       />
                     ) : (
-                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-sm font-bold text-blue-700">
+                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-sm font-bold text-blue-700 flex-shrink-0">
                         {holding.crypto.charAt(0)}
                       </div>
                     )}
 
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <p className="font-semibold text-gray-900">
+                      {" "}
+                      {/* Critical: Allow content to shrink */}
+                      <div className="flex items-center justify-between min-w-0">
+                        <p className="font-semibold text-gray-900 truncate">
                           {holding.crypto}
                         </p>
-                        <p className="text-sm font-bold text-gray-900">
+                        <p className="text-sm font-bold text-gray-900 flex-shrink-0 ml-2">
                           ${holding.current_value.toLocaleString()}
                         </p>
                       </div>
-                      <div className="flex items-center justify-between mt-1">
-                        <p className="text-sm text-gray-600">
+                      <div className="flex items-center justify-between mt-1 min-w-0">
+                        <p className="text-sm text-gray-600 truncate">
                           {holding.amount} @ $
                           {holding.current_price.toLocaleString()}
                         </p>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-2 flex-shrink-0 ml-2">
                           <span
                             className={`text-sm font-medium ${
                               holding.status === "profit"
@@ -246,7 +284,7 @@ export default function ChatInterface() {
     );
   };
 
-  // P&L Component - Material Design style
+  // P&L Component - Material Design style with consistent width
   const ProfitLossView = ({ data }: { data: ProfitLossData }) => {
     const { performance, insights } = data;
     const isProfit = performance.status === "profit";
@@ -287,7 +325,7 @@ export default function ChatInterface() {
     };
 
     return (
-      <div className="w-full">
+      <div className="w-full max-w-2xl">
         <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
           <div className="flex items-center space-x-4 mb-6">
             <div
@@ -568,10 +606,34 @@ export default function ChatInterface() {
     });
   };
 
+  const handlePromptSelect = (prompt: string) => {
+    setInputText(prompt);
+    setShowPrompts(false);
+    // Focus the textarea after selecting prompt
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
+
+  const togglePrompts = () => {
+    setShowPrompts(!showPrompts);
+  };
+
   return (
-    <div className="h-screen bg-[#151B2B] flex flex-col overflow-hidden">
+    <div
+      className="h-screen flex flex-col overflow-hidden relative"
+      style={{
+        backgroundImage: "url('/bg.jpg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundAttachment: "fixed",
+      }}
+    >
+      <div className="absolute inset-0 bg-opacity-10 z-0"></div>
+
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+      <div className="relative z-10 bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Left Section */}
           <div className="flex items-center space-x-4">
@@ -598,23 +660,21 @@ export default function ChatInterface() {
               alt="KoinBX Logo"
               width={120}
               height={40}
-              className="h-12 w-auto"
+              className="h-9 w-auto"
               priority
             />
           </div>
 
           {/* Right Section */}
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-              <User size={16} className="text-blue-700" />
-            </div>
+            <UserAvatar username={currentUserName} className="shadow-sm" />
             <div className="text-gray-900 font-medium">{currentUserName}</div>
           </div>
         </div>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto bg-gray-50 px-6 py-8">
+      <div className="relative z-10 flex-1 overflow-y-auto px-6 py-8 custom-scrollbar">
         <div className="max-w-4xl mx-auto space-y-6">
           {messages.map((message) => (
             <div
@@ -628,29 +688,32 @@ export default function ChatInterface() {
                   message.isUser ? "flex-row-reverse space-x-reverse" : ""
                 }`}
               >
-                <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm ${
-                    message.isUser ? "bg-blue-600" : "bg-[#151B2B]"
-                  }`}
-                >
+                <div className="flex-shrink-0">
                   {message.isUser ? (
-                    <User size={16} className="text-white" />
+                    <UserAvatar
+                      username={currentUserName}
+                      className="shadow-sm"
+                    />
                   ) : (
-                    <Activity size={16} className="text-white" />
+                    <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm">
+                      <Activity size={16} className="text-black" />
+                    </div>
                   )}
                 </div>
 
-                <div className="flex flex-col space-y-2 flex-1">
+                <div className="flex flex-col space-y-2 flex-1 max-w-2xl w-full">
                   <div
                     className={`rounded-2xl shadow-sm w-full ${
                       message.isUser
                         ? "bg-blue-600 text-white p-4"
-                        : "bg-white text-gray-900 p-4 border border-gray-200"
+                        : "bg-white/95 backdrop-blur-sm text-gray-900 p-4 border border-gray-200"
                     }`}
                   >
                     {message.type === "portfolio" &&
                     isJsonMessage(message.text) ? (
-                      <PortfolioView data={message.text as PortfolioData} />
+                      <div className="w-full">
+                        <PortfolioView data={message.text as PortfolioData} />
+                      </div>
                     ) : message.type === "profit_loss" &&
                       isJsonMessage(message.text) ? (
                       <ProfitLossView data={message.text as ProfitLossData} />
@@ -707,7 +770,7 @@ export default function ChatInterface() {
                     )}
                   </div>
                   <div
-                    className={`text-xs text-gray-500 px-2 ${
+                    className={`text-xs text-white/70 px-2 ${
                       message.isUser ? "text-right" : "text-left"
                     }`}
                   >
@@ -721,10 +784,10 @@ export default function ChatInterface() {
           {isTyping && (
             <div className="flex justify-start">
               <div className="flex items-start space-x-4 max-w-2xl">
-                <div className="w-10 h-10 bg-[#151B2B] rounded-full flex items-center justify-center shadow-sm">
-                  <Activity size={16} className="text-white" />
+                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
+                  <Activity size={16} className="text-black" />
                 </div>
-                <div className="bg-white shadow-sm border border-gray-200 p-4 rounded-2xl">
+                <div className="bg-white/95 backdrop-blur-sm shadow-sm border border-gray-200 p-4 rounded-2xl">
                   <div className="flex space-x-2">
                     <div className="w-3 h-3 bg-gray-400 rounded-full animate-bounce"></div>
                     <div
@@ -744,11 +807,43 @@ export default function ChatInterface() {
         </div>
       </div>
 
-      {/* Input Area */}
-      <div className="bg-white border-t border-gray-200 p-6 shadow-sm">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center space-x-4">
-            <div className="flex-1 relative">
+      {/* Input Area - ChatGPT Style */}
+      <div className="relative z-10">
+        {/* Full Width Animated Bubble Prompts */}
+        {showPrompts && (
+          <div className="w-full px-6 mb-4">
+            <div className="flex flex-wrap gap-3 justify-center animate-in slide-in-from-bottom duration-300">
+              {suggestedPrompts.map((prompt, index) => (
+                <button
+                  key={index}
+                  onClick={() => handlePromptSelect(prompt)}
+                  className="px-4 py-2 bg-white/90 backdrop-blur-sm hover:bg-white text-gray-700 hover:text-gray-900 rounded-full text-sm border border-gray-200 hover:border-gray-300 transition-all shadow-sm hover:shadow-md transform hover:scale-105 animate-in zoom-in duration-200"
+                  style={{
+                    animationDelay: `${index * 50}ms`,
+                    transformOrigin: "center center",
+                  }}
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Input Container */}
+        <div className="p-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="relative flex items-end">
+              {/* Animated Plus Button */}
+              <button
+                onClick={togglePrompts}
+                className={`absolute left-3 bottom-3 bg-gray-200 hover:bg-gray-300 text-gray-600 p-2 rounded-full transition-all shadow-sm hover:shadow-md flex-shrink-0 z-20 transform ${
+                  showPrompts ? "rotate-45" : "rotate-0"
+                } duration-300 ease-in-out`}
+              >
+                <Plus size={18} />
+              </button>
+
               <textarea
                 ref={inputRef}
                 value={inputText}
@@ -760,25 +855,91 @@ export default function ChatInterface() {
                     : "Connection issue..."
                 }
                 disabled={isTyping}
-                className="w-full min-h-[56px] max-h-[200px] overflow-hidden resize-none bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed leading-relaxed"
+                className="w-full min-h-[56px] max-h-[200px] overflow-hidden resize-none bg-white/95 backdrop-blur-sm border border-gray-300 rounded-3xl pl-14 py-4 pr-14 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed leading-relaxed shadow-lg custom-scrollbar"
                 rows={1}
               />
+              <button
+                onClick={handleSendMessage}
+                disabled={!inputText.trim() || isTyping || !isConnected}
+                className="absolute right-3 bottom-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white p-2 rounded-full transition-all shadow-sm hover:shadow-md flex-shrink-0"
+              >
+                <Send size={18} />
+              </button>
             </div>
-            <button
-              onClick={handleSendMessage}
-              disabled={!inputText.trim() || isTyping || !isConnected}
-              className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white p-4 rounded-xl transition-all shadow-sm hover:shadow-md flex-shrink-0"
-            >
-              <Send size={20} />
-            </button>
+            {error && (
+              <div className="text-sm text-red-600 mt-3 text-center bg-red-50/95 backdrop-blur-sm rounded-lg p-3 border border-red-200">
+                {error}
+              </div>
+            )}
           </div>
-          {error && (
-            <div className="text-sm text-red-600 mt-3 text-center bg-red-50 rounded-lg p-3 border border-red-200">
-              {error}
-            </div>
-          )}
         </div>
       </div>
+
+      {/* Custom CSS for animations and scrollbars */}
+      <style jsx>{`
+        /* Custom Scrollbar Styles */
+        .custom-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+          height: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(156, 163, 175, 0.5);
+          border-radius: 3px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(156, 163, 175, 0.7);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-corner {
+          background: transparent;
+        }
+
+        /* Animations */
+        @keyframes zoom-in {
+          from {
+            opacity: 0;
+            transform: scale(0.5);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        @keyframes slide-in-from-bottom {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .animate-in {
+          animation-fill-mode: both;
+        }
+
+        .zoom-in {
+          animation-name: zoom-in;
+        }
+
+        .slide-in-from-bottom {
+          animation-name: slide-in-from-bottom;
+        }
+      `}</style>
     </div>
   );
 }
