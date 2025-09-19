@@ -5,13 +5,10 @@ import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import {
   Send,
-  Bot,
   User,
   TrendingUp,
   TrendingDown,
-  Activity,
-  Plus,
-  X,
+  AlertCircle,
 } from "lucide-react";
 
 interface Message {
@@ -19,7 +16,7 @@ interface Message {
   text: string | any;
   isUser: boolean;
   timestamp: Date;
-  type?: "text" | "portfolio" | "profit_loss";
+  type?: "text" | "portfolio"; // Removed profit_loss type
 }
 
 interface ApiResponse {
@@ -60,30 +57,6 @@ interface PortfolioData {
   }>;
 }
 
-interface ProfitLossData {
-  type: "profit_loss";
-  user: string;
-  performance: {
-    total_invested: number;
-    total_current_value: number;
-    profit_loss: number;
-    profit_loss_percentage: number;
-    status: "profit" | "loss";
-    performance_level: string;
-    performance_message?: string;
-    icon?: string;
-    trend_icon?: string;
-  };
-  insights?: {
-    is_outstanding: boolean;
-    is_excellent: boolean;
-    is_positive: boolean;
-    is_significant_loss: boolean;
-    is_normal_volatility: boolean;
-    suggestion: string;
-  };
-}
-
 export default function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
@@ -91,18 +64,15 @@ export default function ChatInterface() {
   const [isConnected, setIsConnected] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string>("");
-  const [currentUserName, setCurrentUserName] = useState("Titas");
-  const [showPrompts, setShowPrompts] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const API_BASE_URL = "http://172.188.32.111:3070/api";
+  // const API_BASE_URL = "http://172.188.32.111:3070/api";
+  const API_BASE_URL = "http://localhost:3070/api";
 
-  // Suggested prompts
+  // Suggested prompts always shown
   const suggestedPrompts = [
-    "Show my portfolio",
-    "Show my P&L",
     "What is KoinBX?",
     "How to register in KoinBX?",
     "How to do KYC in KoinBX?",
@@ -112,13 +82,11 @@ export default function ChatInterface() {
     "Best crypto to buy?",
   ];
 
-  // User Avatar Component
+  // User Avatar Component (only icon, no username text)
   const UserAvatar = ({
-    username,
     size = 40,
     className = "",
   }: {
-    username: string;
     size?: number;
     className?: string;
   }) => (
@@ -126,7 +94,7 @@ export default function ChatInterface() {
       className={`rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold ${className}`}
       style={{ width: size, height: size, fontSize: size * 0.4 }}
     >
-      {username.charAt(0).toUpperCase()}
+      <User size={size * 0.6} />
     </div>
   );
 
@@ -136,8 +104,6 @@ export default function ChatInterface() {
 
     return (
       <div className="w-full">
-        {" "}
-        {/* Add min-w-0 to prevent content expansion */}
         <div className="w-xl bg-white rounded-lg shadow-md p-6 border border-gray-200">
           <div className="flex items-center space-x-4 mb-6">
             <div
@@ -152,8 +118,6 @@ export default function ChatInterface() {
               )}
             </div>
             <div className="min-w-0 flex-1">
-              {" "}
-              {/* Allow text to shrink */}
               <h3 className="font-semibold text-gray-900 text-lg truncate">
                 {data.user}'s Portfolio
               </h3>
@@ -229,8 +193,6 @@ export default function ChatInterface() {
                     )}
 
                     <div className="flex-1 min-w-0">
-                      {" "}
-                      {/* Critical: Allow content to shrink */}
                       <div className="flex items-center justify-between min-w-0">
                         <p className="font-semibold text-gray-900 truncate">
                           {holding.crypto}
@@ -284,150 +246,11 @@ export default function ChatInterface() {
     );
   };
 
-  // P&L Component - Material Design style with consistent width
-  const ProfitLossView = ({ data }: { data: ProfitLossData }) => {
-    const { performance, insights } = data;
-    const isProfit = performance.status === "profit";
-
-    const getPerformanceMessage = (level: string, percentage: number) => {
-      if (performance.performance_message) {
-        return performance.performance_message;
-      }
-
-      switch (level) {
-        case "outstanding":
-          return `🚀 Outstanding! ${percentage.toFixed(1)}% returns`;
-        case "excellent":
-          return `🎯 Excellent! ${percentage.toFixed(1)}% gains`;
-        case "positive":
-          return `📈 Positive returns of ${percentage.toFixed(1)}%`;
-        case "normal_volatility":
-          return `📊 Normal market volatility (${Math.abs(percentage).toFixed(
-            1
-          )}% down)`;
-        case "moderate_loss":
-          return `📉 Moderate loss of ${Math.abs(percentage).toFixed(1)}%`;
-        case "significant_loss":
-          return `⚠️ Significant loss of ${Math.abs(percentage).toFixed(1)}%`;
-        default:
-          return `Portfolio ${isProfit ? "up" : "down"} ${Math.abs(
-            percentage
-          ).toFixed(1)}%`;
-      }
-    };
-
-    const getInsightCardStyle = () => {
-      if (insights?.is_outstanding) return "bg-green-50 border-green-200";
-      if (insights?.is_excellent) return "bg-blue-50 border-blue-200";
-      if (insights?.is_positive) return "bg-emerald-50 border-emerald-200";
-      if (insights?.is_significant_loss) return "bg-red-50 border-red-200";
-      return "bg-gray-50 border-gray-200";
-    };
-
-    return (
-      <div className="w-full max-w-2xl">
-        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-          <div className="flex items-center space-x-4 mb-6">
-            <div
-              className={`p-3 rounded-full ${
-                isProfit ? "bg-green-100" : "bg-red-100"
-              }`}
-            >
-              {isProfit ? (
-                <TrendingUp className="w-6 h-6 text-green-700" />
-              ) : (
-                <TrendingDown className="w-6 h-6 text-red-700" />
-              )}
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 text-lg">
-                {data.user}'s Performance
-              </h3>
-              <p className="text-sm text-gray-600 capitalize">
-                {performance.performance_level.replace("_", " ")}
-              </p>
-            </div>
-            <div className="ml-auto">
-              <span className="text-3xl">
-                {performance.icon || (isProfit ? "🟢" : "🔴")}
-              </span>
-            </div>
-          </div>
-
-          <div className="bg-gray-50 rounded-lg p-5 space-y-5">
-            <div className="grid grid-cols-2 gap-6 text-sm">
-              <div>
-                <p className="text-gray-600 mb-2">Total Invested</p>
-                <p className="font-bold text-gray-900 text-xl">
-                  ${performance.total_invested.toLocaleString()}
-                </p>
-              </div>
-              <div>
-                <p className="text-gray-600 mb-2">Current Value</p>
-                <p className="font-bold text-gray-900 text-xl">
-                  ${performance.total_current_value.toLocaleString()}
-                </p>
-              </div>
-            </div>
-
-            <div className="border-t border-gray-200 pt-5">
-              <p className="text-gray-600 mb-3">Net P&L</p>
-              <div className="flex items-center justify-between">
-                <p
-                  className={`text-2xl font-bold ${
-                    isProfit ? "text-green-700" : "text-red-700"
-                  }`}
-                >
-                  {isProfit ? "+" : ""}$
-                  {Math.abs(performance.profit_loss).toLocaleString()}
-                </p>
-                <span
-                  className={`px-4 py-2 rounded-full font-semibold ${
-                    isProfit
-                      ? "bg-green-100 text-green-700"
-                      : "bg-red-100 text-red-700"
-                  }`}
-                >
-                  {performance.profit_loss_percentage.toFixed(2)}%
-                </span>
-              </div>
-            </div>
-
-            <div className={`rounded-lg p-4 border ${getInsightCardStyle()}`}>
-              <p className="text-gray-900 font-medium">
-                {getPerformanceMessage(
-                  performance.performance_level,
-                  performance.profit_loss_percentage
-                )}
-              </p>
-            </div>
-
-            {insights?.suggestion && (
-              <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                <div className="flex items-start space-x-3">
-                  <span className="text-blue-600 text-lg">💡</span>
-                  <div>
-                    <p className="text-sm font-semibold text-blue-700 mb-2">
-                      Investment Insight:
-                    </p>
-                    <p className="text-sm text-blue-800">
-                      {insights.suggestion}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   const isJsonMessage = (content: any): boolean => {
     return (
       typeof content === "object" &&
       content !== null &&
-      (content.type === "portfolio" || content.type === "profit_loss")
+      content.type === "portfolio"
     );
   };
 
@@ -453,6 +276,15 @@ export default function ChatInterface() {
 
   const loadWelcomeMessage = async () => {
     try {
+      // Add disclaimer message first
+      const disclaimerMessage: Message = {
+        id: "disclaimer",
+        text: "**Disclaimer:** Cryptocurrency investments carry significant risk and high volatility. Past performance does not guarantee future results. The information provided by this bot is for educational purposes only and should not be considered as financial or investment advice. Always conduct thorough research (DYOR) before making any investment decisions. Never invest more than you can afford to lose. Consider consulting with financial professionals for personalized guidance. KoinBX does not guarantee profits or outcomes from trading or investing in digital assets.",
+        isUser: false,
+        timestamp: new Date(),
+        type: "text",
+      };
+
       const response = await fetch(`${API_BASE_URL}/chat/welcome`, {
         method: "GET",
         headers: {
@@ -474,19 +306,30 @@ export default function ChatInterface() {
         type: "text",
       };
 
-      setMessages([welcomeMessage]);
+      // Set disclaimer first, then welcome message
+      setMessages([disclaimerMessage, welcomeMessage]);
       setIsConnected(true);
       setError(null);
     } catch (error) {
       console.error("Error loading welcome message:", error);
-      const fallbackMessage: Message = {
-        id: "welcome-fallback",
-        text: `Hi **${currentUserName}**! 👋 I'm your **KoinBX Crypto Assistant**. I can help you with:\n\n💰 **Your Portfolio** - Check balance, P&L, holdings\n📈 **Market Data** - Latest crypto prices\n🔍 **Crypto Info** - Learn about blockchain\n\nTry: "show my portfolio" or "what's Bitcoin's price?"\n\nHow can I help you today?`,
+
+      const disclaimerMessage: Message = {
+        id: "disclaimer",
+        text: "**Disclaimer:** Cryptocurrency investments carry significant risk and high volatility. Past performance does not guarantee future results. The information provided by this bot is for educational purposes only and should not be considered as financial or investment advice. Always conduct thorough research (DYOR) before making any investment decisions. Never invest more than you can afford to lose. Consider consulting with financial professionals for personalized guidance. KoinBX does not guarantee profits or outcomes from trading or investing in digital assets.",
         isUser: false,
         timestamp: new Date(),
         type: "text",
       };
-      setMessages([fallbackMessage]);
+
+      const fallbackMessage: Message = {
+        id: "welcome-fallback",
+        text: `Hi! 👋 I'm your **KoinBX Crypto Assistant**. I can help you with:\n\n💰 **Your Portfolio** - Check balance, holdings\n📈 **Market Data** - Latest crypto prices\n🔍 **Crypto Info** - Learn about blockchain\n\nTry: "show my portfolio" or "what's Bitcoin's price?"\n\nHow can I help you today?`,
+        isUser: false,
+        timestamp: new Date(),
+        type: "text",
+      };
+
+      setMessages([disclaimerMessage, fallbackMessage]);
       setIsConnected(false);
       setError("Connection issue. Using offline mode.");
     }
@@ -518,10 +361,6 @@ export default function ChatInterface() {
         requestBody.sessionId = sessionId;
       }
 
-      if (currentUserName) {
-        requestBody.userName = currentUserName;
-      }
-
       const response = await fetch(`${API_BASE_URL}/chat/message`, {
         method: "POST",
         headers: {
@@ -543,7 +382,7 @@ export default function ChatInterface() {
         setSessionId(data.sessionId);
       }
 
-      let messageType: "text" | "portfolio" | "profit_loss" = "text";
+      let messageType: "text" | "portfolio" = "text";
       if (isJsonMessage(data.message)) {
         messageType = data.message.type;
       }
@@ -608,16 +447,13 @@ export default function ChatInterface() {
 
   const handlePromptSelect = (prompt: string) => {
     setInputText(prompt);
-    setShowPrompts(false);
     // Focus the textarea after selecting prompt
     if (inputRef.current) {
       inputRef.current.focus();
     }
   };
 
-  const togglePrompts = () => {
-    setShowPrompts(!showPrompts);
-  };
+  // Always show prompts, so no toggle needed
 
   return (
     <div
@@ -656,20 +492,17 @@ export default function ChatInterface() {
           {/* Center Logo */}
           <div className="absolute left-1/2 transform -translate-x-1/2">
             <Image
-              src="/logo.svg"
+              src="/ainew.svg"
               alt="KoinBX Logo"
               width={120}
               height={40}
-              className="h-9 w-auto"
+              className="h-12 w-auto"
               priority
             />
           </div>
 
-          {/* Right Section */}
-          <div className="flex items-center space-x-3">
-            <UserAvatar username={currentUserName} className="shadow-sm" />
-            <div className="text-gray-900 font-medium">{currentUserName}</div>
-          </div>
+          {/* Right Section - Removed username and avatar */}
+          <div />
         </div>
       </div>
 
@@ -684,39 +517,53 @@ export default function ChatInterface() {
               }`}
             >
               <div
-                className={`flex items-start space-x-4 max-w-2xl ${
+                className={`flex items-start space-x-4 max-w-2xl relative ${
                   message.isUser ? "flex-row-reverse space-x-reverse" : ""
                 }`}
               >
                 <div className="flex-shrink-0">
                   {message.isUser ? (
-                    <UserAvatar
-                      username={currentUserName}
-                      className="shadow-sm"
-                    />
+                    <UserAvatar className="shadow-sm" />
                   ) : (
                     <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm">
-                      <Activity size={16} className="text-black" />
+                      <Image
+                        src="/vercel.svg"
+                        alt="Assistant"
+                        width={27}
+                        height={27}
+                        className="pt-1.5 pl-0.5"
+                      />
                     </div>
                   )}
                 </div>
 
                 <div className="flex flex-col space-y-2 flex-1 max-w-2xl w-full">
                   <div
-                    className={`rounded-2xl shadow-sm w-full ${
+                    className={`rounded-2xl shadow-sm w-full relative ${
                       message.isUser
                         ? "bg-blue-600 text-white p-4"
                         : "bg-white/95 backdrop-blur-sm text-gray-900 p-4 border border-gray-200"
                     }`}
                   >
+                    {/* AI logo for assistant bubbles */}
+                    {!message.isUser && (
+                      <div className="absolute bottom-2 right-2 w-5 h-5 rounded-full overflow-hidden">
+                        <Image
+                          src="/ai.png"
+                          alt="AI"
+                          width={20}
+                          height={20}
+                          quality={100}
+                          priority
+                        />
+                      </div>
+                    )}
+
                     {message.type === "portfolio" &&
                     isJsonMessage(message.text) ? (
                       <div className="w-full">
                         <PortfolioView data={message.text as PortfolioData} />
                       </div>
-                    ) : message.type === "profit_loss" &&
-                      isJsonMessage(message.text) ? (
-                      <ProfitLossView data={message.text as ProfitLossData} />
                     ) : (
                       <ReactMarkdown
                         components={{
@@ -784,20 +631,20 @@ export default function ChatInterface() {
           {isTyping && (
             <div className="flex justify-start">
               <div className="flex items-start space-x-4 max-w-2xl">
-                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
-                  <Activity size={16} className="text-black" />
+                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm relative">
+                  <Image
+                    src="/vercel.svg"
+                    alt="Assistant"
+                    width={27}
+                    height={27}
+                    className="pt-1.5 pl-0.5"
+                  />
+
+                  <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-blue-600 animate-spin"></div>
                 </div>
                 <div className="bg-white/95 backdrop-blur-sm shadow-sm border border-gray-200 p-4 rounded-2xl">
-                  <div className="flex space-x-2">
-                    <div className="w-3 h-3 bg-gray-400 rounded-full animate-bounce"></div>
-                    <div
-                      className="w-3 h-3 bg-gray-400 rounded-full animate-bounce"
-                      style={{ animationDelay: "0.1s" }}
-                    ></div>
-                    <div
-                      className="w-3 h-3 bg-gray-400 rounded-full animate-bounce"
-                      style={{ animationDelay: "0.2s" }}
-                    ></div>
+                  <div className="text-gray-500 text-sm">
+                    Assistant is typing...
                   </div>
                 </div>
               </div>
@@ -807,72 +654,70 @@ export default function ChatInterface() {
         </div>
       </div>
 
-      {/* Input Area - ChatGPT Style */}
+      {/* Input Area */}
       <div className="relative z-10">
-        {/* Full Width Animated Bubble Prompts */}
-        {showPrompts && (
-          <div className="w-full px-6 mb-4">
-            <div className="flex flex-wrap gap-3 justify-center animate-in slide-in-from-bottom duration-300">
-              {suggestedPrompts.map((prompt, index) => (
-                <button
-                  key={index}
-                  onClick={() => handlePromptSelect(prompt)}
-                  className="px-4 py-2 bg-white/90 backdrop-blur-sm hover:bg-white text-gray-700 hover:text-gray-900 rounded-full text-sm border border-gray-200 hover:border-gray-300 transition-all shadow-sm hover:shadow-md transform hover:scale-105 animate-in zoom-in duration-200"
-                  style={{
-                    animationDelay: `${index * 50}ms`,
-                    transformOrigin: "center center",
-                  }}
-                >
-                  {prompt}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Input Container */}
-        <div className="p-6">
-          <div className="max-w-4xl mx-auto">
-            <div className="relative flex items-end">
-              {/* Animated Plus Button */}
+        {/* Suggestion bubbles always visible */}
+        <div className="w-full px-6 mt-4 mb-1">
+          <div className="flex flex-wrap gap-3 justify-center animate-in slide-in-from-bottom duration-300">
+            {suggestedPrompts.map((prompt, index) => (
               <button
-                onClick={togglePrompts}
-                className={`absolute left-3 bottom-3 bg-gray-200 hover:bg-gray-300 text-gray-600 p-2 rounded-full transition-all shadow-sm hover:shadow-md flex-shrink-0 z-20 transform ${
-                  showPrompts ? "rotate-45" : "rotate-0"
-                } duration-300 ease-in-out`}
+                key={index}
+                onClick={() => handlePromptSelect(prompt)}
+                className="px-4 py-2 bg-white/90 backdrop-blur-sm hover:bg-white text-gray-700 hover:text-gray-900 rounded-full text-sm border border-gray-200 hover:border-gray-300 transition-all shadow-sm hover:shadow-md transform hover:scale-105 animate-in zoom-in duration-200"
+                style={{
+                  animationDelay: `${index * 50}ms`,
+                  transformOrigin: "center center",
+                }}
               >
-                <Plus size={18} />
+                {prompt}
               </button>
-
-              <textarea
-                ref={inputRef}
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder={
-                  isConnected
-                    ? "Ask me about your portfolio, crypto prices, market trends..."
-                    : "Connection issue..."
-                }
-                disabled={isTyping}
-                className="w-full min-h-[56px] max-h-[200px] overflow-hidden resize-none bg-white/95 backdrop-blur-sm border border-gray-300 rounded-3xl pl-14 py-4 pr-14 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed leading-relaxed shadow-lg custom-scrollbar"
-                rows={1}
-              />
-              <button
-                onClick={handleSendMessage}
-                disabled={!inputText.trim() || isTyping || !isConnected}
-                className="absolute right-3 bottom-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white p-2 rounded-full transition-all shadow-sm hover:shadow-md flex-shrink-0"
-              >
-                <Send size={18} />
-              </button>
-            </div>
-            {error && (
-              <div className="text-sm text-red-600 mt-3 text-center bg-red-50/95 backdrop-blur-sm rounded-lg p-3 border border-red-200">
-                {error}
-              </div>
-            )}
+            ))}
           </div>
         </div>
+
+        {/* Disclaimer Text with Exclamation Icon */}
+        <div className="w-full flex items-center justify-center pt-2 px-6 mb-0 text-gray-700 text-xs select-none">
+          <AlertCircle className="w-5 h-5 mr-2 text-blue-600 flex-shrink-0" />
+          <span>
+            This content is generated by AI, may be inaccurate at times, and
+            should not be considered financial advice.
+          </span>
+        </div>
+
+        {/* Input container */}
+      <div className="p-3">
+  <div className="max-w-4xl mx-auto">
+    <div className="relative flex items-end">
+      <textarea
+        ref={inputRef}
+        value={inputText}
+        onChange={(e) => setInputText(e.target.value)}
+        onKeyPress={handleKeyPress}
+        placeholder={
+          isConnected
+            ? "Ask me about your portfolio, crypto prices, market trends..."
+            : "Connection issue..."
+        }
+        disabled={isTyping}
+        className="w-full min-h-[56px] max-h-[200px] overflow-hidden resize-none bg-white/95 backdrop-blur-sm border border-gray-300 rounded-3xl pl-6 py-4 pr-14 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed leading-relaxed shadow-lg custom-scrollbar"
+        rows={1}
+      />
+      <button
+        onClick={handleSendMessage}
+        disabled={!inputText.trim() || isTyping || !isConnected}
+        className="absolute right-3 bottom-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white p-2 rounded-2xl transition-all shadow-sm hover:shadow-md flex-shrink-0"
+      >
+        <Send size={18} />
+      </button>
+    </div>
+    {error && (
+      <div className="text-sm text-red-600 mt-3 text-center bg-red-50/95 backdrop-blur-sm rounded-lg p-3 border border-red-200">
+        {error}
+      </div>
+    )}
+  </div>
+</div>
+
       </div>
 
       {/* Custom CSS for animations and scrollbars */}
