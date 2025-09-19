@@ -68,8 +68,7 @@ export default function ChatInterface() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // const API_BASE_URL = "http://172.188.32.111:3070/api";
-  const API_BASE_URL = "http://localhost:3070/api";
+  const API_BASE_URL = "http://172.188.32.111:3070/api";
 
   // Suggested prompts always shown
   const suggestedPrompts = [
